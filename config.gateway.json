@@ -1,0 +1,15 @@
+{
+    "system": {
+        "task-scheduler": {
+            "task": {
+                "dnsupdate": {
+                    "executable": {
+                        "path": "/config/scripts/UpdateVpnIps.sh",
+                        "arguments": "example.com"
+                    },
+                    "interval": "2m"
+                }
+            }
+        }
+    }
+} 
