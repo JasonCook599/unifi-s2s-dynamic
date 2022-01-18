@@ -21,6 +21,9 @@ Run the following commands on your gateway to download the script.
     # Save the current remote IP
     echo $RemoteIP > /config/UpdateVpnIps.config
 
+    # Verify remote IP saved correctly
+    cat /config/UpdateVpnIps.config
+
 ## Unifi Controller Setup
 ### Dynamic DNS
 If you haven't already, you should set up dynamic dns so the you can find the IP address when it changes. In the controller, navigate to `Settings > Services > Dynamic DNS > Create new dynamic DNS`. Fill in the fields with the details given to you by your DNS provider.
@@ -33,7 +36,8 @@ For the script to run, you need to create a task schedule in your [`config.gatew
     cd <unifi_base>/data/sites/<site_ID>
 
     # Download the script
-    sudo curl -s -C -o config.gateway.json https://raw.githubusercontent.com/koinoniacf/unifi-s2s-dynamic/main/config.gateway.json
+    # THIS WILL OVERWRITE config.gateway.json
+    sudo curl -s -o config.gateway.json https://raw.githubusercontent.com/koinoniacf/unifi-s2s-dynamic/main/config.gateway.json
 
     # Set proper ownership permissions
     chown unifi:unifi config.gateway.json
@@ -41,9 +45,12 @@ For the script to run, you need to create a task schedule in your [`config.gatew
     # Open the file for editing
     sudo vi config.gateway.json
 
-- Press `i` to enter insert mode
 - Use the arrow keys to navigate to `example.com`
--  Replace it with the remote site's DNS name
+- Press `i` to enter insert mode
+- Replace `example.com` with the remote site's DNS name
 - Press `Esc`
 - Type `:wq`
 - Press `Enter`
+
+### Provision the changes
+In the controller, navigate to `Devices > Gateway > Config > Manage device > Provision`
