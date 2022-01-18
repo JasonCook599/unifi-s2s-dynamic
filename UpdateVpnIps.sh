@@ -24,6 +24,8 @@ LocalIP=$(curl https://ifconfig.me/ip) #The IP address of this sevice.
 RemoteIP=$(host $RemoteDNS | grep -Pom 1 '[0-9.]{7,15}') || throw "$RemoteDNS doesn't resolved to an IP."
 OldRemoteIP=$(</config/UpdateVpnIps.config)
 CMD="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
+Show="$CMD show vpn ipsec site-to-site peer $OldRemoteIP"
+Set="$CMD set vpn ipsec site-to-site peer $RemoteIP"
 
 echo "Using remote IP of $RemoteIP via $RemoteDNS"
 echo "Old remote IP is $OldRemoteIP"
@@ -34,9 +36,6 @@ $CMD begin
 if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration under specified path is empty" ]]; then
     echo "Remote IP changed from $OldRemoteIP to $RemoteIP."
     echo "Copying settings to new remote IP address"
-
-    Show="$CMD show vpn ipsec site-to-site peer $OldRemoteIP"
-    Set="$CMD set vpn ipsec site-to-site peer $RemoteIP"
 
     $Set description "Updated automatically at $(date)"
 
@@ -66,9 +65,10 @@ if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration und
     $CMD save
     $CMD end
 
-    echo $RemoteIP > /config/UpdateVpnIps.config # Save current remote IP for future runs.
+    echo $RemoteIP >/config/UpdateVpnIps.config # Save current remote IP for future runs.
     exit 0
 else
+    $Set description "Updated automatically at $(date)"
     echo "Remote IP didn't change."
 fi
 
@@ -76,6 +76,7 @@ echo "Checking if local IP changed."
 if [[ "$LocalIP" != "$($CMD show vpn ipsec site-to-site peer $RemoteIP local-address | grep -Pom 1 '[0-9.]{7,15}')" ]]; then
     echo "Local IP changed. Updating configuration with peer $RemoteIP"
     $CMD set vpn ipsec site-to-site peer $RemoteIP local-address $LocalIP
+    $Set description "Updated automatically at $(date)"
     $CMD commit
     $CMD save
     $CMD end
