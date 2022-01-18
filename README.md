@@ -1,11 +1,49 @@
-# Unifi Site-to-Site VPNs with Dynamic IPs
+# Introduction
+Unifi allows you to create a site-to-site VPN to connect two different sites. When both sites are hosted on the same controller, dynamic IP address changes are handled automatically.
+
+If the sites are on different controllers, you must manually update the configuration for both sites if either IP address changes. This script allows for IP address changes to be handled automatically.
+
+# Setup
+You must complete these steps on the devices in both sites.
+
 ## Gateway Setup
-- Copy `UpdateVpnIps.sh` to `/config/scripts/UpdateVpnIps.sh`. 
-- Run `chmod +x /config/scripts/UpdateVpnIps.sh` to mark the script as executable.
-- Run the following commands to save the current remote IP address. Update `host.example.com` to your dynamic dns host name. 
+Run the following commands on your gateway to download the script.
 
-      RemoteIP=$(host example.com | grep -Pom 1 '[0-9.]{7,15}') && echo $RemoteIP || echo "ERROR: That host doesn't resolved to an IP."
-      echo $RemoteIP > /config/UpdateVpnIps.config
+    # Download the script
+    sudo curl -s -o /config/scripts/UpdateVpnIps.sh https://raw.githubusercontent.com/koinoniacf/unifi-s2s-dynamic/main/UpdateVpnIps.sh
 
-### Unifi Controller
-Add the above script as a scheduled task in [`config.gateway.json`](https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration). You can use the [sample file](config.gateway.json) if this doesn't already exist.
+    # Mark the script as executable
+    sudo chmod +x /config/scripts/UpdateVpnIps.sh`
+
+    # Replace example.com with the remote site's DNS name.
+    RemoteIP=$(host example.com | grep -Pom 1 '[0-9.]{7,15}') && echo $RemoteIP || echo "ERROR: That host doesn't resolved to an IP."
+    
+    # Save the current remote IP
+    echo $RemoteIP > /config/UpdateVpnIps.config
+
+## Unifi Controller Setup
+### Dynamic DNS
+If you haven't already, you should set up dynamic dns so the you can find the IP address when it changes. In the controller, navigate to `Settings > Services > Dynamic DNS > Create new dynamic DNS`. Fill in the fields with the details given to you by your DNS provider.
+
+### Running the script
+For the script to run, you need to create a task schedule in your [`config.gateway.json`](https://help.ui.com/hc/en-us/articles/215458888-UniFi-USG-Advanced-Configuration) file. If you haven't already created this file, you can follow the steps below to use the [sample file](config.gateway.json). If the file already exists, you will need to create the task manually. See these pages for more information on [<unifi_base>](https://help.ui.com/hc/en-us/articles/115004872967) and [<site_ID>](https://help.ui.com/hc/en-us/articles/215458888-UniFi-How-to-further-customize-USG-configuration-with-config-gateway-json#:~:text=The%20site_ID%20can,s/ceb1m27d/dashboard).
+
+    # Change directory to appropriate site
+    # Update <unifi_base> and <site_ID> to match your configuration
+    cd <unifi_base>/data/sites/<site_ID>
+
+    # Download the script
+    sudo curl -s -C -o config.gateway.json https://raw.githubusercontent.com/koinoniacf/unifi-s2s-dynamic/main/config.gateway.json
+
+    # Set proper ownership permissions
+    chown unifi:unifi config.gateway.json
+
+    # Open the file for editing
+    sudo vi config.gateway.json
+
+- Press `i` to enter insert mode
+- Use the arrow keys to navigate to `example.com`
+-  Replace it with the remote site's DNS name
+- Press `Esc`
+- Type `:wq`
+- Press `Enter`
