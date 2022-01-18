@@ -7,7 +7,7 @@
                         "path": "/config/scripts/UpdateVpnIps.sh",
                         "arguments": "example.com"
                     },
-                    "interval": "10m"
+                    "interval": "2m"
                 }
             }
         }
