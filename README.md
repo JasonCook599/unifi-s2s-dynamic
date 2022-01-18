@@ -13,7 +13,7 @@ Run the following commands on your gateway to download the script.
     sudo curl -s -o /config/scripts/UpdateVpnIps.sh https://raw.githubusercontent.com/koinoniacf/unifi-s2s-dynamic/main/UpdateVpnIps.sh
 
     # Mark the script as executable
-    sudo chmod +x /config/scripts/UpdateVpnIps.sh`
+    sudo chmod +x /config/scripts/UpdateVpnIps.sh
 
     # Replace example.com with the remote site's DNS name.
     RemoteIP=$(host example.com | grep -Pom 1 '[0-9.]{7,15}') && echo $RemoteIP || echo "ERROR: That host doesn't resolved to an IP."
