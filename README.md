@@ -54,3 +54,9 @@ For the script to run, you need to create a task schedule in your [`config.gatew
 
 ### Provision the changes
 In the controller, navigate to `Devices > Gateway > Config > Manage device > Provision`
+
+# Troubleshooting
+## Remote IP Out of Sync
+The script is set up to copy settings from the old to new IP. This is done to retain as much functionality as possible in the Unifi Controller.
+
+On occasion, the IP address saved by the script and the remote IP address used by the gateway may go out if sync. This will cause the links to go down. When this occurs, simply add the new remote IP to the controller. Future IP changes will be handled by the script.
