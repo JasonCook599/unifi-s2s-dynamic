@@ -15,7 +15,7 @@ function throw() {
 
 # Get the remote DNS address from the first parameter.
 if [ -z $1 ]; then
-    throw "You must spesify the demote DNS address with the first parameter."
+    throw "You must spesify the remote DNS address with the first parameter."
 else
     RemoteDNS=$1
 fi
