@@ -1,7 +1,7 @@
 #!/usr/bin/env bash
 #
 # This script cleans up orphaned configure sessions and releases disk (RAM) space
-$ https://community.ui.com/questions/Lingering-config-session/dffc0fef-1ced-4012-bea9-9f1313b06a76
+# https://community.ui.com/questions/Lingering-config-session/dffc0fef-1ced-4012-bea9-9f1313b06a76
 VERSION='0.7.1'
 ME=$(basename ${0})
 
