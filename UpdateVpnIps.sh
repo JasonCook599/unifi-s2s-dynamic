@@ -27,60 +27,31 @@ CMD="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
 Show="$CMD show vpn ipsec site-to-site peer $OldRemoteIP"
 Set="$CMD set vpn ipsec site-to-site peer $RemoteIP"
 
-echo "Using remote IP of $RemoteIP via $RemoteDNS"
-echo "Old remote IP is $OldRemoteIP"
-echo "Using local IP of $LocalIP"
+echo "Updating VPN connection from $LocalIP to $RemoteDNS ($RemoteIP)"
+$CMD begin
 
-echo "Checking if Remote IP changed."
-if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration under specified path is empty" ]]; then
-    $CMD begin
-    echo "Remote IP changed from $OldRemoteIP to $RemoteIP."
-    echo "Copying settings to new remote IP address"
-
-    $Set description "Updated automatically at $(date)"
-
-    Current=$($Show authentication mode)
-    $Set authentication $Current
-
-    Current=$($Show authentication pre-shared-secret)
-    $Set authentication $Current
-
-    Current=$($Show connection-type)
-    $Set $Current
-
-    Current=$($Show ike-group)
-    $Set $Current
-
+if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration under specified path is empty" ]]; then    
+    echo "Remote IP changed from $OldRemoteIP to $RemoteIP. Copying settings to new remote IP address."
+    $Set authentication $($Show authentication mode)
+    $Set authentication $($Show authentication pre-shared-secret)
+    $Set $($Show connection-type)
+    $Set $($Show ike-group)
     $Set local-address $LocalIP # Updating local IP Address
-
-    Current=$($Show vti bind)
-    $Set vti $Current
-
-    Current=$($Show vti esp-group)
-    $Set vti $Current
-
-    $CMD delete vpn ipsec site-to-site peer $OldRemoteIP
-
-    $CMD commit
-    $CMD save
-    $CMD end
-
+    $Set vti $($Show vti bind)
+    $Set vti $($Show vti esp-group)
+    if [[ $OldRemoteIP != $RemoteIP ]]; then $CMD delete vpn ipsec site-to-site peer $OldRemoteIP ; fi #sanity check don't delete what youre working on
     echo $RemoteIP >/config/UpdateVpnIps.config # Save current remote IP for future runs.
-    exit 0
 else
-    $Set description "Updated automatically at $(date)"
     echo "Remote IP didn't change."
 fi
 
-echo "Checking if local IP changed."
 if [[ "$LocalIP" != "$($CMD show vpn ipsec site-to-site peer $RemoteIP local-address | grep -Pom 1 '[0-9.]{7,15}')" ]]; then
-    $CMD begin
     echo "Local IP changed. Updating configuration with peer $RemoteIP"
     $CMD set vpn ipsec site-to-site peer $RemoteIP local-address $LocalIP
-    $Set description "Updated automatically at $(date)"
-    $CMD commit
-    $CMD save
-    $CMD end
 else
     echo "Local IP didn't change."
 fi
+$Set description "Updated automatically at $(date)"
+$CMD commit
+$CMD save
+$CMD end
