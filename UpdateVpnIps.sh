@@ -41,6 +41,7 @@ if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration und
     $Set vti $($Show vti esp-group)
     if [[ $OldRemoteIP != $RemoteIP ]]; then $CMD delete vpn ipsec site-to-site peer $OldRemoteIP ; fi #sanity check don't delete what youre working on
     echo $RemoteIP >/config/UpdateVpnIps.config # Save current remote IP for future runs.
+    Changes=true
 else
     echo "Remote IP didn't change."
 fi
@@ -48,10 +49,16 @@ fi
 if [[ "$LocalIP" != "$($CMD show vpn ipsec site-to-site peer $RemoteIP local-address | grep -Pom 1 '[0-9.]{7,15}')" ]]; then
     echo "Local IP changed. Updating configuration with peer $RemoteIP"
     $CMD set vpn ipsec site-to-site peer $RemoteIP local-address $LocalIP
+    Changes=true
 else
     echo "Local IP didn't change."
 fi
-$Set description "Updated automatically at $(date)"
-$CMD commit
-$CMD save
+
+if [[ $Changes ]]; then # Only save when changes are made.
+    echo "Saving chaanges. Please wait"
+    $Set description "Updated automatically at $(date)"
+    $CMD commit
+    $CMD save
+fi
+
 $CMD end
