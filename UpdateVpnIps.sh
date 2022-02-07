@@ -20,7 +20,7 @@ else
     RemoteDNS=$1
 fi
 
-LocalIP=$(curl https://ifconfig.me/ip) #The IP address of this sevice.
+LocalIP=$(curl https://ifconfig.me/ip -s) #The IP address of this sevice.
 RemoteIP=$(host $RemoteDNS | grep -Pom 1 '[0-9.]{7,15}') || throw "$RemoteDNS doesn't resolved to an IP."
 OldRemoteIP=$(</config/UpdateVpnIps.config)
 CMD="/opt/vyatta/sbin/vyatta-cfg-cmd-wrapper"
