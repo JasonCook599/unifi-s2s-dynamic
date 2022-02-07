@@ -32,8 +32,8 @@ echo "Old remote IP is $OldRemoteIP"
 echo "Using local IP of $LocalIP"
 
 echo "Checking if Remote IP changed."
-$CMD begin
 if [[ "$($CMD show vpn ipsec site-to-site peer $RemoteIP)" == "Configuration under specified path is empty" ]]; then
+    $CMD begin
     echo "Remote IP changed from $OldRemoteIP to $RemoteIP."
     echo "Copying settings to new remote IP address"
 
@@ -74,6 +74,7 @@ fi
 
 echo "Checking if local IP changed."
 if [[ "$LocalIP" != "$($CMD show vpn ipsec site-to-site peer $RemoteIP local-address | grep -Pom 1 '[0-9.]{7,15}')" ]]; then
+    $CMD begin
     echo "Local IP changed. Updating configuration with peer $RemoteIP"
     $CMD set vpn ipsec site-to-site peer $RemoteIP local-address $LocalIP
     $Set description "Updated automatically at $(date)"
