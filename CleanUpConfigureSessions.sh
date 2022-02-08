@@ -5,7 +5,7 @@
 VERSION='0.7.1'
 ME=$(basename ${0})
 
-if [ -d $1 ]; then
+if [ -n $1 ]; then
     echo "${ME} Running in DEBUG mode"
     DEBUG="echo Dry run, this command would be executed: "
 fi
